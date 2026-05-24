@@ -1,0 +1,111 @@
+# Implementation of Complimentary Filter for MPU-6050 6-DOF IMU
+# Author: Philip Salmony [pms67@cam.ac.uk]
+# Code in python
+
+start
+   ↓
+Initialize IMU
+   ↓
+Calculate gyro bias
+   ↓
+Loop starts
+   ↓
+Read accelerometer
+   ↓
+Read gyroscope
+   ↓
+Remove gyro bias
+   ↓
+Compute angle rates
+   ↓
+Apply complementary filter
+   ↓
+Print roll & pitch
+   ↓
+Repeat
+
+from imu import * 
+// importing libraries from the imu model
+// IMU(); get_gyro_bias(); get_acc_angles(); get_gyro()
+
+from time import sleep, time 
+// sleep() to cause a delay
+// time() to calculate time elapsed(delta t) which returns time in seconds
+
+from math import sin, cos, tan, pi
+// to calculate mathematical functions from the math library
+
+imu = IMU()
+// creating an object imu which helps communicate with the IMU sensor
+
+# Iterations and sleep time
+N = 1000
+// to loop 1000 times
+
+sleep_time = 0.01
+// 0.01 becomes frequency of 100Hz (1/0.01)
+
+# Filter coefficient
+alpha = 0.1
+// the ratio to smoothen the the signal
+
+print("Calculating average gyro bias...")
+[bx, by, bz] = imu.get_gyro_bias(200)
+// unpacking of offset values: 3 floating point values as a list
+// used for gyro bias calibration, for when the gyro calculates non-zero values even when static, that can grow well over time
+// 200 readings are taken for this
+// ex: 0.03 deg/s
+// these biases are later subtracted
+
+# Complimentary filter estimates
+phi_hat = 0.0
+// roll angle across x-axis
+
+theta_hat = 0.0
+// pitch angle across y-axis
+
+// both the angle values are initially assumed as zero
+
+print("Running...")
+
+# Measured sampling time
+dt = 0.0
+// there is a difference in time between various iterations, which is first 0 of course since both current and start times are the same
+
+start_time = time()
+// stores current time stamp 
+
+for i in range(N):
+    dt = time() - start_time
+    // as long as we are in the range of iterations, we can calculate the dt = current_time() - start_time()
+    start_time = time()
+   // update start_time() as time() which is the current_time()
+// this is to update the time to current, then the next is calculated and subtracted and this time is the difference in each iteration
+    
+    # Get estimated angles from raw accelerometer data
+    [phi_hat_acc, theta_hat_acc] = imu.get_acc_angles()
+// using the arctan and arcsin values we have derived from the formula
+    
+    # Get raw gyro data and subtract biases
+    [p, q, r] = imu.get_gyro()
+    p -= bx
+    q -= by
+    r -= bz
+// first, we get the p,q,r values of angular velocities along all 3 axes and subtract the biases from them: bx, by, bz
+
+    # Calculate Euler angle derivatives 
+    phi_dot = p + sin(phi_hat) * tan(theta_hat) * q + cos(phi_hat) * tan(theta_hat) * r
+    theta_dot = cos(phi_hat) * q - sin(phi_hat) * r
+    // the angular velocities we find are wrong since it is with respect to the body's frame and not globallu accurate
+    // the body rates must be converted to euler rates, by using required matrices
+    
+    # Update complimentary filter
+    phi_hat = (1 - alpha) * (phi_hat + dt * phi_dot) + alpha * phi_hat_acc
+    theta_hat = (1 - alpha) * (theta_hat + dt * theta_dot) + alpha * theta_hat_acc  
+   // use another formula for the complimentary filter
+    
+    # Display results
+    print("Phi: " + str(round(phi_hat * 180.0 / pi, 1)) + " | Theta: " + str(round(theta_hat * 180.0 / pi, 1)))
+    // to convert radian values to degree values: rounding off to one decimal place, which might not be required
+
+    sleep(sleep_time)
