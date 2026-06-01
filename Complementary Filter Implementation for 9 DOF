@@ -1,1 +1,81 @@
+1. 9DOF using EULER ANGLES:
 
+Start
+   ↓
+Initialize IMU
+   ↓
+Initialize Magnetometer
+   ↓
+Calculate Gyro Bias
+   ↓
+Loop Starts
+   ↓
+Read Accelerometer
+   ↓
+Read Gyroscope
+   ↓
+Read Magnetometer
+   ↓
+Remove Gyro Bias
+   ↓
+Compute Roll & Pitch from Accelerometer
+   ↓
+Compute Yaw from Magnetometer
+   ↓
+Compute Euler Angle Rates
+   ↓
+Apply Complementary Filter
+   ↓
+Update Roll (φ)
+Update Pitch (θ)
+Update Yaw (ψ)
+   ↓
+Display Roll, Pitch, Yaw
+   ↓
+Repeat
+
+2. 9DOF using Quaternions:
+
+Start
+   ↓
+Initialize IMU
+   ↓
+Initialize Magnetometer
+   ↓
+Calculate Gyro Bias
+   ↓
+Initialize Quaternion
+(q0 = 1, q1 = q2 = q3 = 0)
+   ↓
+Loop Starts
+   ↓
+Read Accelerometer
+   ↓
+Read Gyroscope
+   ↓
+Read Magnetometer
+   ↓
+Remove Gyro Bias
+   ↓
+Normalize Accelerometer
+   ↓
+Normalize Magnetometer
+   ↓
+Compute Orientation Error
+(Accel + Magnetometer)
+   ↓
+Correct Gyroscope Drift
+   ↓
+Compute Quaternion Derivative
+(q̇)
+   ↓
+Integrate Quaternion
+   ↓
+Normalize Quaternion
+   ↓
+Convert Quaternion to
+Roll, Pitch, Yaw (Optional)
+   ↓
+Display Orientation
+   ↓
+Repeat
