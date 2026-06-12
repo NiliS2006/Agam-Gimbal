@@ -1,0 +1,20 @@
++---------------------+
+|  Sensor Fusion      |
+| (Madgwick/Mahony)   |
++----------+----------+
+           |
+           v
+    Current Quaternion
+           |
+           v
++---------------------+
+| Quaternion PID      |
+| Library             |
++----------+----------+
+           |
+           v
+    Roll Pitch Yaw
+      Corrections
+           |
+           |
+    Hardware Layer
