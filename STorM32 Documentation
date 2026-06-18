@@ -1,0 +1,69 @@
+Some important documentation from OlliW's STorM32 v3 Brushless Gimbal Controllers:
+
+- STorM32 NT is the use of NT bus for communication between STorM32 gimbal controller and its peripherals, such as IMU modules.
+- NT stands for New Technology
+
+- I2C Bus: Inter - integrated Circuit is a synchronous, multi-master/multi-slave serial communication protocol.
+- It is used for attaching lower-speed peripherals such as sensors and displays to micro-controllers over short, intra_board distances.
+- It consists of only 2 bi-directional wires to connect multiple devices: SDA(Serial data Line) and SCL(Serial Clock Line).
+
+- Major drawback of first gen STorM32 was its reliance on I2C Bus for communicating with the IMUs and I2C bus's sensitivity to electrical noise.
+- STorM32 NT provides a solution by replacing the I2C bus by and NT bus.
+- NT bus is a 'standard serial UART', with a high baudrate(2.000.000bps).
+- Baud Rate is the number of symbol changes or signalling events made to a transmission medium per second. It measures a system's signalling speed, determining how fast data moves through serial connections like UART or modems.
+- Disturbance sensitivity is massively low than I2C since low impedance and push-pull, hence error-free.
+- Error overcoming is pretty easy.
+
+- NT concept advantages:
+1. easily daisy-chained, results in clear wiring
+2. can be replaced easily, extraordinary flexibility
+Simplifies technological advances
+
+- STorM32-Link refers to a data protocol for exchanging low-level data between the STorM32 gimbal controller and a drone's flight controller, to achieve advanced gimbal perofrmance.
+- Primary goal would be to overcome 2 general and hard-to-tackle issues, namely:
+1. drfiting of yaw axis: Yaw Drift Compensation
+2. tilting of horizon in high-g flight maneuvers, such as high speed turns: Horizon Drift Compensation
+- The STorM32-Link data packets are exchanged via the same serial UART connection also used for conventional serial/MAVLink commands for controlling and operating the gimbal.
+
+- STorM32 Boards that we are going to work on: 
+- There are 3 generations, namely:
+1. v3.xx : Latest generation of firmware. does not support boards with STM32F103 microcontroller(v1.3x, v3.3, v4.1)
+2. v2.xx : Prev generation. It strictly relies on the NT bus and requires setups which use the NT bus.
+3. v0.96 : Old generation, only used for setups which use the I2C bus for the IMUs.
+
+- The hardware design of the STorM32 main controller has many versions as follows:
+1. v6.x
+2. v4.1
+3. v3.3
+4. v1.3x
+(going to deal with 2 and 4)
+
+- v1.3x: First generation of STorM32 boards. A large number of variations exist which are the variants of the original v1.3 board, not supported by the v3.xx firmware.
+- v4.1: It is based on the STM32F103RC microcontroller. It is similar to the v3.3 series of boards, except, it has motor drivers on the board itself. It is not supported by the v3.xx firmware.
+
+- NT Imu
+v4.x: Main characteristics: STM32G4 based
+v1.x, v2.x: Main characteristics: STM32F103 based
+- NT Motor
+v4.x: Main characteristics: STM32G4 based
+v2.x: Main characteristics: STM32F103 based
+- NT Logger
+v2.x: Main characteristics: STM32G4 based
+v1.x: Main characteristics: STM32F103 based
+
+- STorM32 v3's main board must have an STM32H7 micrcontroller and all the NT modules must have an STM32G4 microcontroller.
+
+Do's and Don'ts:
+1. No body part must get into contact with the battery(plus pole), which destroys the board immediately.
+2. Voltage on POT and BUT pins must never exceed 3.3V, which may lead to board destruction immediately.
+3. Voltage on other pins must never exceed 5V.
+4. Never apply voltage to a 3.3V pin. And never connect a 3.3V pin to a GND pin.
+5. Do not use metal screws to mount the board and never power anything from the 3.3V power rail except the: camera IMU, 2nd IMU, joystick.
+
+- All STorM32 boards have 2 LEDs: green, red, that provide info about controller's current status.
+- The red indicates health of the board. it blinks at a frequency of 1Hz. It blinks faster than it can under low battery voltage or a missing IMU.
+- The green indicates current status of the controller. At NORMAL state, it is permanently switched on, and at the start, it blinks in sequences.
+
+- The STorM32 ports are named after that type they are: USB, UART, UART2, UART3. They all are accessible in the GUI in the same way. Pins corresponding to these serial ports are labelled as Rx/Tx.
+- MCU Peripherals: STorM32 used the STM32 series of chips. Serial Peripherals are UARTx or USARTx, where x goes from 1 to 10.
+
