@@ -1,0 +1,36 @@
+- Gimbal: A device used to stabilize a camera in one or more axes. 
+- Any aircraft during flight is subject to external movement by wibds, thermals, turbulence and vibrations from the props and motors. 
+- This may cause the video and images to blur.
+- A gimbal senses the movemnt of the aircraft and moves the camera, via a brushless motor or servo, to keep it level even through the aircraft movememnt. 
+- As the aircraft moves, the gimbal keeps the camera level in more than one axes, and returns it back to the same level once aircraft moves back to level.
+- Brushless gimbals are way more popular than servo motors and much costlier.
+- Brushless Gimbals(Camera Tilting): rely on specialized multi-pole brushless outrunner motors. They are driven by dedicated IMU sensors and a stabilization board.
+- Servo Gimbals(Pan-tilting functions): use of geared rotary motors and a potentiometer to know exactly what the angle the motor is turned to. Typically, they are brushed.
+- The camera must be balanced on the gimbal, so as to conserve the energy that might be consumed in having the gimbal balancing the camera separately.
+
+- Every 50g of extra weight just reduces your flight time by 1 minute.
+- A BGC has consists of the main board: drivers for mototrs, MP and an interface to communicate with the board.
+- It has another little board which is the IMU that determines the position and movement of the camera. 
+- The sensor must be mounted on to the camera support, so it moves with the camera, while the main board is connected to something that does not move.
+- Modern gimbal controllers an onbiard USB interface but some do require an FDTI cable that interfaces the serial output of the gimbal to a USB port on the desktop or laptop.
+- FDTI: Future Device Technology International
+- BEC stands for Battery Eliminator Cicrcuit, which steps down voltage.
+- The gimbal controller has a power input that you need to supply from a BEC appropriate for the voltage requirement.
+- 12v : 3s [or 16v : 4s or 24v : 6s will need a step down convertor to lower the voltage for the gimbal].
+- One to Three servo motors  to plug into the flight contoller transmitter to control the tilt, roll and pan of the gimbal.
+- Using the flight controller enables one to connect the gimbal directly to the three spare channels to control the gimbal on three outputs of the flight controller.
+- Next, a camera must be installed and conrolled. There will be triggers for the camera to come from video to still mode. 
+- It is best to use flight controllers with a serial or a CAN bus connection. It saves output channls from the flight controller to the gimbal. It sitll needs the RC transmitter to have enough channels and switches the control to everything you want. 
+- Most modern cameras have no AV output to send video back to ground. They may be designed to use wifi, and this is a real problem since the wifi range is short. Wifi may sometimes interfere with the RC control as well since they work on the same frequency.
+- It is important to know if your camera can film even while composing and not just during filming a video.
+- It is also important to know what interface of video is: Standard or HDMI.
+- Standard would use analog connections like VGA or Component Video, which transmits only video signa;s.
+- HDMI(High Defininition Multimedia Interface) instead transmits multiple signals and is completely digital.
+- One may also need a video switch. In case of flight cameras and gimbal cameras, one may need to switch between films. But this may require another channel on your transmitter.
+- Some systems offer dual controllers: one for controlling the gimbal used by the videographer and one for controlling the flight camera used by the pilot to control the aircraft. 
+
+- Gimbals are not that good in removing the fine, fast vibrations transmitted through the mechanical connection of the gimbal to the aircraf. 
+- Hence, it may be mounted with some kind of a suspension system to dampen the multi-rotor's vibrations so they don't interfere with the gimbal.
+- It must be noted that the gimbal must hang on the rubber balls rather than hanging from them. The rubber balls are designed to workin compression rather than in tension. 
+- Gimbals built for specific cameras work way better than general purpose gimbals.
+
