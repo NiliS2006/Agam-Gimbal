@@ -1,0 +1,124 @@
+1. Dashboard: Live Tuning of the controller
+- values may be changed while the running of motors. designed for filed tuning.
+
+2. PID:
+a. Gyro LPF: 
+- LPF is a low pass filter. The controller hates noisy measurements, as we know. Instead of whole numbers, it computes something along close enough decimals.
+Ex: 0, 0.5, 0.7, 1.3, 1.1, 1.8, 1.5 miliseconds and so no.
+- Now, the Gyroscope measures the angular velocity and the controller would be prone to electrical bibrations and noise. 
+- It creates a smoother spike of curve when values are 1.5ms, and not 
+  - 1: too small value, less filtering, faster response, but more noise.
+  - 5: too big a value, more filtering, slower response, but lesser vibrations.
+- It is best to stick with this vlaue until the PID tuning.
+
+b. IMU2 FeedForward LPF: Only for the second IMU(if needed)
+- This IMU would be  ounted on the camera.
+- Controller predicts the motion of the camera and feeds the information forward to improve stabilization.
+
+c. Voltage Correction: As the battery voltage drops down, total troque produced by the brushless motors also reduces. Hence the total output is also reduced.
+- This feature helps to increase motor output even if the voltage decreases, which helps in stabilization.
+- Use of same battery and voltage values can leave you at using 0% itself throughout.
+
+d. PID: For each axis: Roll, Pitch, Yaw
+- There are 4 values for each respectively: P, I, D, Motor Vmax.
+
+- P is the proportional gain. Multiply the error with the pitch value to find the 'motor power'.
+- I is the inetgral gain that accumulates and adds on over time. 
+-  D is the derivative part that predicts the future errors based on what the current looks like, somewhat like the break of a 
+
+- Pitch P
+- Larger errors means stronger corrective action.
+- Higher P, overshooting and oscillating.
+- Lower P, gimbals feel weak and does not hold position well.
+
+- Pitch I
+- The I term eliminates the error completely by adding up the errors slowly over time, and then generates enough torque for the same.
+- Too much I causes slow oscillations or drift after movement.
+
+- Pitch D
+- Without D, the gimbal may feel bouncy.
+- With too much of it, it makes it noisy and amplifies measurement noise.
+
+- Motor Vmax: Limits the maximum motor drive.
+- Too slow: sluggish response, poor disturbance rejection.
+- Too high: Hotter mtors, higher current drawing, increased risk of oscillation.
+
+e. Controller: Selects the stabilization algorithm or standard controller. 
+- Roll and Mixing: It has nothing do with PID Tuning. Instead, it determines how much the roll motor helps compensate for yaw movements. It must only be used in cases where you notice that
+  - horizon tilts wheneevr yaw rotates
+  - fast yaw moevments causes horizon drift
+  - There is no need to use it in case of a mechanically well-aligned gimbal and the horizon stays level during yaw, or if the roll axis correctly compensates for the yaw movement.
+
+f. D Source: Tells the controller where to obtain the derivative information.
+- Since the gyroscope directly measures angular velocity, it is a recommended choice, using it for the D term gives a cleaner, more responsive derivative estimate. 
+
+g. Auto Write PID Changes: After adjusting the values of the PID, we would need to send it to the controller immediately. 
+- It makes tuning fatser since you don't need to press Write after every small adjustment. 
+- But, sending a value to the RAM is different from permanently saving it on the EEPROM.
+
+h. Data Display: Of course, it is used to display how well the Gimbal Controller is tuned through the curves.
+- You may clear data, record or even save it.
+- It also measures the Rx, Ry, Rz, Pitch, Roll, Yaw, Control values of the former three as well.
+
+i. The Read option would be used to read the controller settings in the beginning, after using the Connect button to Connect to the required COM port.
+
+3. Pan: While the Dashboard/PID tabs control the internal stabilization, the PAN tab controls the outer loop.
+-It decides upon what the ideal angle the camera must point to.
+
+a. Pan Mode Control: It determines who controls the Pan Mode: Hold, Pan, Follow, AUX, Prearm, MAVLink, Virtual.
+- OFF: means no external source can change the PAN mode. It remains the default setting. 
+- RC: It is the most common option, where an RC controls the PAN mode. It is like a 3-position switch on your transmitter. one of the three positions can be selected: hold, pan follow, hold-hold-pan.
+- Virtual: Instead of a physical RC Channel, the controller reads off of a Virtual Channel. Commands can come from:
+MAVLink; Serial API; Script; Raspberry Pi; STM32; Companion Computer
+- AUX: AN auxillary Input instead of an RC Channel.
+- RC channels are free just to control the camera movements, while the AUX is a switch to change modes.
+- Prearm: Here, before arming the gimbal, certain modes are disabled. This helps prevent accidental movement during the startup. 
+-MAVLink: Now the auto-pilot controls the pan mode. During flight, the ArduPilot can switch modes.
+- Script: Instead of a pilot, the internal script changes modes. 
+- API/ Serial: External Software controls pan mode. 
+- NT Bus: Using NT modules would require another board on the bus.
+
+- OFF: Camera is always locked to this world, the camera does not follow your hand movements.
+- HOLD: Camera stays fixed.
+- PAN: The camera follows your left and right movements, and the up and down directions are always locked.
+- FOLLOW: Camera smoothly follows any movements of the handle.
+
+b. Pan Mode Default Setting: This tells each axis whether is is Pitch:Hold, Roll:Hold, Yaw:Pan: Pitch Locked, Roll locked, Yaw follows.
+
+c. Preset Mode Setting #1, #2, #3: There are 3 presets namely: hold hold hold; hold hold pan and pan pan pan respectively.
+
+d. Pitch Pan: It is follow gain. It handles how smoothly the camera moves with the handles movements. If too high, it reacts instantly, and if too low, it gives a slower, more cinematic video look.
+
+e. Roll Pan: Usually 0, since no follow is required for the horizon with the operator.
+
+f. Yaw Pan: The same, but more important, since it is regarding the 'yaw' movement.
+
+g. Deadband: an option that avoids tiny movements. Without any deadband, the camera constantly twitches. It is a specific range of input values where changes in a system does not produce any observable reaction or change in output.
+
+h. Expo: Expo changes the joystick response. It is linear with the camera. 
+
+j. Ptch Pan Method: Normal: Determines how the follow angle is computed. 
+
+h. Roll Pan Method: Plane: Instead of following the angle of the IMU's raw roll angle, the controller computes the roll relative to the horizontal plane. This avids strange behavior during combined pitch and yaw movements.
+
+i. Yaw Pan Deadband LPF: This filters to avoid sudden camera jerks. 
+
+4. RC Inputs: This tab is where STorM32 translates commands from the PWM, PPM, SBUS, MAVLink, analog inputs, or serial interfaces into target camera angles or mode changes. - It also decides whether an input should picth, yaw, switch follow modes, trigger functions, or execute scripts.
+
+a. RC Dead Band: Usually, RC receivers may output the following: 
+- 1000 µs = Full Left
+- 1500 µs = Center
+- 2000 µs = Full Right 
+- But these values are not always the same since RC receivers are not perfect.
+- Without the deadband, the camera is always jittering. With it, the camera tends to stay perfectly still. 
+
+b. RC Hysteresis: Hysteresis actually prevents 'rapid switching'. Without this, the controller might keep changing its decision. Simply put, hysteresis is a delay between when the motor receives a command and when the device actually moves to the correct position. 
+- It usually occurs because of worn out bearings or the usgae of older joysticks.
+- To avoid this, it is best to calibrate the gimbal always and tighten it.
+
+c. RC Pitch, Roll or Yaw: The controller assigns the axes with the respective RC Channels.
+
+d. RC Pitch Mode:There are several modes based on how the transmitter stick moves with the camera.
+1. Absolute Centered: Stick position maps to specific camera angle.
+2. Relative Mode: Stick position maps to camera speed.
+3. Absolute Not Centered: Stick position maps to specific angle, but not straight forward.
