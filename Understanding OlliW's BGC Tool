@@ -122,3 +122,148 @@ d. RC Pitch Mode:There are several modes based on how the transmitter stick move
 1. Absolute Centered: Stick position maps to specific camera angle.
 2. Relative Mode: Stick position maps to camera speed.
 3. Absolute Not Centered: Stick position maps to specific angle, but not straight forward.
+
+e. RC Pitch Min/Max: It limits movement of the joystick. Even if the stick commands a high value of angle, it is clamped by the firmware.
+
+f. RC Speed Limit: It limits the angular speed. Instead of directly: 0 to 25 degrees per second, it gradually increases in value per 5 degrees.
+- In this way, there is no motion blur for the audience.
+
+g. RC Acceleration Limit: Even if the speed is limited, there are chances that it keeps changing instantly. Accelerating limit smooths out that transition, instead of jumping quickly.
+
+h. RC Expo(Exponential): It is a transmitter setting that actually softens stick sensitivity near the centre of the stick. 
+- By reducing the twitchiness for small movement, it makes the controls less abrupt. 
+
+i. RC Trim: It is the adjustment made on a radio controller to callibrate the neutral center point of your model's control surfaces. It electronically shifts the "centre" of the stick or the trigger.
+
+j. Auto Trim: This button measures the current neutral RC Values and automatically fills in the trim offsets. 
+
+5. Functions: It does not calculate motor currents. It tells the controller what mode or operation to enter. 
+
+a. Re-Center Camera: Firmware changes the current camera angle to the target values. 
+- PID moves until the camera reaches those angles.
+
+b. Re-Center Caamera Axes: It determines which axes are affected. Only that axes is reset then. 
+
+c. Re-center Camera Mode: For example, the yaw motot has rotated several full turns in order to follow a subject. Teh acbles become twisted. Instead of snaping directly back, the controller finds the smallest way to find the shortest safe path to untwist the yaw axis. 
+- This prevents unnecessary rotation.
+
+d. Retract: This option moves the gimbal into a transport or parked position. 
+
+e. Standby: The controller disables the motor drive while remaining powered. The IMU continues running but the motors stop producing torque. 
+- This is useful for: balancing the camera, charging batteries, or transporting the gimbal briefly. 
+
+f. Camera Control: STorM32 can control of the ec=xternal cameras as well, not just moving them, but giving commands like: Take a photo, start rceording, etc. 
+- These commands may besent through PWm or serial interfaces. 
+
+g. Camera Model: It tells the firmware how the camera expects commands.
+- It includes models like: generic rc, serial api, pwm, etc.
+
+h. Camera Control Mode: This button helps activate and control camera functions.
+For example, first press maybe to start video, second press maybe to trigger the shutter, so on...
+
+i. Camera Time Interval: This mode actually enables interval shooting, as in, the controller automatically sends in outputs for every decided interval of time.
+
+j. Camera COM Port: It specifies which serial port is used to communicate with the camera.
+
+k. PWM Out Control: This button generates standard PWM signals, instead of directly controlling the motors. 
+- It can drive a servo, external shutter, LED controller, relay or another MC.
+
+l. PWM Out Mid: It outputs what RC servos expect as center position. 
+
+m. RC Min/Max: These define the output range. The firmware clamps output to these values even if the internal value requests something larger.
+
+n. PWM Out Speed Limit: Firmware gradually ramps the PWM value to create smoother motion for connected servos, instead of jumping directly. 
+
+6. Scripts: In this tab, instead of triggering one action at a time, you can create sequences for actions.
+
+7. Setup: It determines whether the controller understand the hardware conrrectly. Any incorrect setting here can make the gimbal vibrate violently, flip over, or refuse to initialize.
+- It defines the hardware for IMU's, Motors, etc.
+
+a. IMU2 Configuration: This button tells the firmware a second IMU exists.
+- Now, the controller knows how the frame moved and how the camera moved, instead of knowing only how the camera moved.
+
+b. Visual Channel Configuration: This is a virtual RC Channel. 
+- Instead of reading pwm, ppm, sbus ect, the controller creates an internal value to send signals for certain actions to be performed. 
+- the firmware must store these commands somewhere. There is no physical wire to carry this signal, but memory in which the command exists.
+
+c. UARTx Configuration: This determines what each UARtx port does. 
+
+d. PWM Out Configuration: The PWM generation can work globally only if this tab is enabled. 
+
+e. Pitch/Roll/Yaw Usage: To connect a certian wire with a certain motor, to avoid PID loops fighting with each other, else the gimbal will be unstable.
+
+f. Startup Mode: It tells the firmware what to do immediately after power-up. 
+
+g. Startup delay: It is smoother to enable motors with a delay, and this can avoid incorrect estimate done by motors being enabled too quickly.
+
+h. Prearm Checks: Before enabling motors, StorM32 can verify condistions such as:
+1. If IMU Calibration is done
+2. Sensor Communication is done
+3. Battery Voltage is acceptable
+4. Configuration is valid.
+- It prevents the gimbal from trying to stabilize with bad data.
+
+i. RC Pitch/Roll/Yaw Offset: These are angle offsets. It is handy when the mechanical "center" is not the viewing angle you want. 
+
+j. low Voltage Limit: Controller continuously measures the battery voltage, and if the average cell voltage drops below a certian value( say, 3.1V), it can: beep, warn, disable motors, trigger a response, etc...
+
+k. Beep with Motors: Different beep modes change the types of notifications produced, since brushless motors can act like speakers.
+
+l. NT Logging: It is an internal logging system.
+- The controller can record: IMU data, PID values, RC Inouts, Motot=r Outputs, Errors, System events.
+- It acts as a flight recorder for gimbal.
+
+m. Enable/Disable Motors: Useful in balancing motors, testing motor directions, checking wiring. For disabling, power remains ON, but torque is not produced.
+
+8. Gimbal: It teaches the firmware what kind of robot your gimbal is. The gimbal provides all important information for the same.
+
+a. IMU Orientation: To orient the gimbal controller to be perfectly level, whatever direction it is pointed towards. It stores these values as a matrix. 
+
+b. Motor Poles: Signifies the number of magnetic poles on the rotor. 
+- This is because the controller cares about the electrical angle. 
+
+c. Motor Direction: The firmware determines which sequences corresponds to positive motion during the configuration of the controller. 
+
+d. Startup Motor Position: BGC's have no absolute psoition sensor. To generate torque though, it needs to know the rotor's electrical position. STorM32 knows the last know startup position as stored in EEPROM, which is loaded on the next boot.
+
+e. Motor Offset: The mechanical zero of the camera may not correspond exactly to the motor's electrical zero. Instead of physically remounting the motor, one can just tell the controller. 
+
+f. Configure Gimbal Tool: For calibration.
+
+
+9. Calibration: It answers how a controller knows what exactly the IMU is actually measuring. 
+- In reality, the MC estimates the error model of the sensors. 
+- Calibrating the controller actually removes silly errors like: thinking the camera is tilted even when it is perfectly levelled.
+
+a. Deactivate the motors. Power up board with USB only. Motors are then deactivated, to avoid contaminated measurements.
+
+b. IMU Selection: To select the one for the camera, or the one for flight.
+
+c. Run 1-Point Calibration: We go with thee asusmption that the camera is perfectly level. Gravity must perfectly point towards the +z axis. It stores the offset value as well.
+
+d. Run 6-Point Calibration: Placing the IMU in six orientations. 
+
+e. Acc Zero for all three axes: Here, every accelerometer reading becomes: x=x-bias(x).
+- After calibration, biases stored.
+
+f. Acc Scale: It is something that correct the readings as: x=x*scale(x).
+
+g. Sensor Selection: You can calibrate either A, G or Acc+Gyro.
+
+h. Load from File: Instead of recalibrating all your motors once again, simply save it and load it. It is especially useful when you are replacing firmware. 
+
+i. Save to File: Writes the calibration to disk. If the EEPROM gets corrupted, you can restore it instantly.
+
+j. Reset to default: Deletes calibration and controller behaves like a factory-fresh board.
+
+k. Read from board: Reads calibration values that are already stored in the EEPROM. 
+
+l. Store Calibration: This is to store calibration in the EEPROM instead of just the RAM.
+
+10. Firmware: 
+- There is selection of board and firmware version. 
+- To flash the firmware, you have to select the hex file. 
+- The Programmer Type is simply the one who programs the STM32: USB Bootloader, ST-Link, DFU Mode, etc.
+- Full chip erase, to erase flash from the MC.
+- Verify Flashed Firmware: A safety feature to verify flashing of firmware.
+- There is a button to flash firmware finally. 
